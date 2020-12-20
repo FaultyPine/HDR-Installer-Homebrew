@@ -14,7 +14,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: binary
-        path: Ultimate_Mod_Manager.nro
+        path: HDR_Installer.nro
   upload:
     runs-on: ubuntu-latest
     needs: build
@@ -31,4 +31,4 @@ jobs:
         body: Latest commit, automatically updated. May not be fully tested or fully working.
         prerelease: true
         recreate: true
-        assets: binary/Ultimate_Mod_Manager.nro:Ultimate_Mod_Manager.nro:application/octet-stream
+        assets: binary/HDR_Installer.nro:HDR_Installer.nro:application/octet-stream
