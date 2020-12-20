@@ -71,7 +71,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=c++17
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-no-as-needed,-Map,$(notdir $*.map)
 
-LIBS	:= -lnx -lstdc++fs -lmbedcrypto -lzstd
+LIBS	:= -lnx -lstdc++fs -lzstd
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

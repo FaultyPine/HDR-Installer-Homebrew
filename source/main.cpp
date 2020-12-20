@@ -2,83 +2,69 @@
 #include "menu.h"
 using namespace std;
 
-const string standard_download_msg_start = "Beginning download...";
-const string standard_uninstall_msg_start = "Beginning uninstallation...";
+const char* standard_download_msg_start = "Beginning download...";
+const char* standard_uninstall_msg_start = "Beginning uninstallation...";
 
-Menu install_menu = 
-Menu(
-    "Install HDR",
-    {
-        Menu("Install HDR-Base", {Menu(standard_download_msg_start)})
-    }
-);
+// Install HDR
+static Menu hdr_base("Install HDR-Base", &standard_download_msg_start, 1);
+static Menu* install_submenus[1] = { &hdr_base };
+static Menu install_menu("Install HDR", install_submenus, 1);
 
-Menu addons_menu = 
-Menu(
-    "Addons",
-    {
-        Menu("HDR-Graphics", {Menu(standard_download_msg_start)}),
-        Menu("Main Menu Theme Song", {Menu(standard_download_msg_start)}),
-        Menu("HDR-Tips", {Menu(standard_download_msg_start)}),
-        Menu("Bassnaut's Song Pack", {Menu(standard_download_msg_start)})
-    }
-);
+// Addons
+static Menu hdr_graphics("HDR-Graphics", &standard_download_msg_start, 1);
+static Menu theme_song("Main Menu Theme Song", &standard_download_msg_start, 1);
+static Menu hdr_tips("HDR-Tips", &standard_download_msg_start, 1);
+static Menu song_pack("Bassnaut's Song Pack", &standard_download_msg_start, 1);
+static Menu* addons_submenus[4] = { &hdr_graphics, &theme_song, &hdr_tips, &song_pack };
+static Menu addons_menu("Addons", addons_submenus, 4);
 
-Menu uninstall_menu = 
-Menu(
-    "Uninstall HDR",
-    {
-        Menu("Uninstall HDR-Base", {Menu(standard_uninstall_msg_start)}),
-        Menu("Uninstall All Addons", {Menu(standard_uninstall_msg_start)}),
-        Menu("Uninstall HDR-Graphics", {Menu(standard_uninstall_msg_start)}),
-        Menu("Uninstall Main Menu Theme Song", {Menu(standard_uninstall_msg_start)}),
-        Menu("Uninstall HDR-Tips", {Menu(standard_uninstall_msg_start)}),
-        Menu("Uninstall Bassnaut's Song Pack", {Menu(standard_uninstall_msg_start)})
-    }
-);
+// Uninstall
+static Menu u_hdr_base("Uninstall HDR-Base", &standard_uninstall_msg_start, 1);
+static Menu u_all_addons("Uninstall All Addons", &standard_uninstall_msg_start, 1);
+static Menu u_hdr_graphics("Uninstall HDR-Graphics", &standard_uninstall_msg_start, 1);
+static Menu u_theme_song("Uninstall Main Menu Theme Song", &standard_uninstall_msg_start, 1);
+static Menu u_hdr_tips("Uninstall HDR-Tips", &standard_uninstall_msg_start, 1);
+static Menu u_song_pack("Uninstall Bassnaut\'s Song Pack", &standard_uninstall_msg_start, 1);
+static Menu* uninstall_submenus[6] = { &u_hdr_base, &u_all_addons, &u_hdr_graphics, &u_theme_song, &u_hdr_tips, &u_song_pack };
+static Menu uninstall_menu("Uninstall", uninstall_submenus, 6);
 
-Menu main_menu = 
-Menu(
-    "Main Menu", 
-    {
-        install_menu,
-        addons_menu, 
-        uninstall_menu
-    }
-);
+static Menu* main_submenus[3] = { &install_menu, &addons_menu, &uninstall_menu };
+static Menu main_menu("Main Menu", main_submenus, 3);
 
-void mainMenuLoop(u64 kDown, Menu &menu) {
-    int selected = menu.currently_selected_menu_idx;
-    int num_submenus = menu.submenus.size();
+void mainMenuLoop(u64 kDown, Menu*& menu) {
+    int selected = menu->selected;
+    int num_entries = menu->child_count;
     //printf("\nSelected: %i\n", selected);
     //printf("\nselected menu selection: %i\n", menu.submenus[selected].currently_selected_menu_idx);
 
     /* Scroll up */
     if (kDown & KEY_LSTICK_UP) {
-        selected = (selected-1) % num_submenus;
+        selected = (selected-1) % num_entries;
         if (selected < 0) {
-            selected += num_submenus;
+            selected += num_entries;
         }
-        menu.currently_selected_menu_idx = selected;
+        menu->selected = selected;
     }
     /* Scroll down */
     else if (kDown & KEY_LSTICK_DOWN) {
-        selected = abs((selected+1) % num_submenus);
-        menu.currently_selected_menu_idx = selected;
+        selected = abs((selected+1) % num_entries);
+        menu->selected = selected;
     }
     /* Select */
     else if (kDown & KEY_A) {
-        if (num_submenus > 0 && selected >= 0 && selected < num_submenus && menu.submenus[selected].submenus.size() > 0) {
-            menu.currently_selected_menu_idx = 0;
-            menu = menu.submenus[selected];
-            menu.currently_selected_menu_idx = 0;
+        if (!menu->is_strings && num_entries > 0 && selected >= 0 && selected < num_entries && menu->children.submenus[selected]->child_count > 0) {
+            menu->selected = 0;
+            menu = menu->children.submenus[selected];
+            menu->selected = 0;
         }
     }
     /* Back out */
     else if (kDown & KEY_B) {
-        menu.currently_selected_menu_idx = 0;
-        menu = main_menu;
-        menu.currently_selected_menu_idx = 0;
+        if (menu->parent != nullptr) {
+            menu->selected = 0;
+            menu = menu->parent;
+            menu->selected = 0;
+        }
     }
     /* Launch smash */
     else if (kDown & KEY_X) {
@@ -96,7 +82,7 @@ int main(int argc, char **argv)
     //socketInitializeDefault();              // Initialize sockets
     //nxlinkStdio();                          // Redirect stdout and stderr over the network to nxlink
 
-    Menu current_menu = main_menu;
+    Menu* current_menu = &main_menu;
 
     while(appletMainLoop())
     {
@@ -107,7 +93,7 @@ int main(int argc, char **argv)
 
         if(kDown & KEY_PLUS) break; // break in order to return to hbmenu
 
-        current_menu.printMenu();
+        current_menu->printMenu();
         mainMenuLoop(kDown, current_menu);
         printf(WHITE "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPress X to launch smash" RESET);
 

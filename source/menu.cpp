@@ -1,58 +1,45 @@
 #include "menu.h"
 
-Menu::Menu() {
-    this->menu_title = "";
-    this->submenus = {};
-    this->body = {};
-    this->currently_selected_menu_idx = 0;
+Menu::Menu(const char* _title) {
+    title = _title;
+    child_count = 0;
+    is_strings = false;
+    children.submenus = nullptr;
+    parent = nullptr;
+    selected = 0;
 }
 
-Menu::Menu(string m_title) {
-    this->menu_title = m_title;
-    this->submenus = {};
-    this->body = {};
-    this->currently_selected_menu_idx = 0;
+Menu::Menu(const char* _title, Menu** submenus, size_t count) {
+    title = _title;
+    child_count = count;
+    is_strings = false;
+    children.submenus = submenus;
+    for (size_t i = 0; i < count; i++) {
+        children.submenus[i]->parent = this;
+    }
+    parent = nullptr;
+    selected = 0;
 }
 
-Menu::Menu(string m_title, vector<string> m_body) {
-    this->menu_title = m_title;
-    this->submenus = {};
-    this->body = m_body;
-    this->currently_selected_menu_idx = 0;
-}
-
-Menu::Menu(string m_title, vector<Menu> m_submenus) {
-    this->menu_title = m_title;
-    this->submenus = m_submenus;
-    this->body = {};
-    this->currently_selected_menu_idx = 0;
+Menu::Menu(const char* _title, const char** substrings, size_t count) {
+    title = _title;
+    child_count = count;
+    is_strings = true;
+    children.substrings = substrings;
+    parent = nullptr;
+    selected = 0;
 }
 
 void Menu::printMenu() {
-    printf(GREEN);
-    printf(this->menu_title.c_str());
-    printf("\n\n");
-    printf(RESET);
+    printf(GREEN "%s\n\n" RESET, title);
 
-    if (this->submenus.size() > 0) {
-        for(int i = 0; i < (int)this->submenus.size(); i++) {
-            if (i == this->currently_selected_menu_idx) {
-                printf(BLUE);
-                printf(this->submenus[i].menu_title.c_str());
-                printf("\n");
-                printf(RESET);
-            }
-            else {
-                printf(this->submenus[i].menu_title.c_str());
-                printf("\n");
-            }
-        }
-    }
-
-    if (this->body.size() > 0) {
-        printf("\n\n\n\n\n");
-        for(int i = 0; i < (int)this->body.size(); i++) {
-            printf(this->body[i].c_str());
+    if (child_count > 0) {
+        for (size_t i = 0; i < child_count; i++) {
+            const char* element = is_strings ? children.substrings[i] : children.submenus[i]->title;
+            if (i == selected)
+                printf(BLUE "%s\n" RESET, element);
+            else
+                printf("%s\n", element);
         }
     }
 }
