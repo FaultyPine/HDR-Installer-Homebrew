@@ -1,2 +1,10 @@
-# HDR-Installer-Homebrew
- A homebrew application to download/manage an HDR installation
+# HDR Installer
+A homebrew application to install HewDraw Remix and its addons.
+
+
+
+## Build from source
+Need:
+- [A DEVKITPRO environment](https://devkitpro.org/wiki/Getting_Started)
+
+Then simply build with the command `make`.

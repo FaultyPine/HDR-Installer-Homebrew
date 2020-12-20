@@ -1,0 +1,1 @@
+make && nxlink -a 192.168.1.84 HDR_Installer.nro

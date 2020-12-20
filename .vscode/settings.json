@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "filesystem": "cpp",
+        "xstring": "cpp",
+        "cstdlib": "cpp",
+        "xlocale": "cpp",
+        "xlocinfo": "cpp",
+        "vector": "cpp",
+        "map": "cpp",
+        "cstring": "cpp"
+    }
+}

@@ -1,0 +1,34 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64:latest
+    steps:
+    - uses: actions/checkout@master
+    - name: make
+      run: make LATESTTAG=Beta
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: binary
+        path: Ultimate_Mod_Manager.nro
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/download-artifact@v1
+      with:
+        name: binary
+    - name: Upload Release
+      uses: Genwald/create-release@eba889c
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: beta
+        code: beta
+        body: Latest commit, automatically updated. May not be fully tested or fully working.
+        prerelease: true
+        recreate: true
+        assets: binary/Ultimate_Mod_Manager.nro:Ultimate_Mod_Manager.nro:application/octet-stream
