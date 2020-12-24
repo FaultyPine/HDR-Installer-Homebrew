@@ -17,7 +17,7 @@ extern "C" {
 using namespace std;
 namespace fs = std::filesystem;
 
-#define APP_VERSION           "1.0.1"
+#define APP_VERSION           "1.0.2"
 
 #define HDR_INSTALLER_PATH    "sdmc:/switch/HDR_Installer/"
 #define HDR_ROMFS_PATH        "sdmc:/ultimate/mods/"
