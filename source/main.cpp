@@ -156,7 +156,7 @@ int main(int argc, char **argv)
         //u64 kDown = padGetButtonsDown(&pad);
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
 
-        if(kDown & HidNpadButton_Plus) break; // break in order to return to hbmenu
+        if(kDown & KEY_PLUS) break; // break in order to return to hbmenu
 
         current_menu->printMenu();
         mainMenuLoop(kDown, current_menu);
