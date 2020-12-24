@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build:
-    if: "contains(github.event.head_commit.message, 'Release:')"
     runs-on: ubuntu-latest
     container: devkitpro/devkita64:latest
     steps:
@@ -17,7 +16,6 @@ jobs:
         name: binary
         path: HDR_Installer.nro
   upload:
-    if: "contains(github.event.head_commit.message, 'Release:')"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v1
