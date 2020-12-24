@@ -9,13 +9,13 @@ jobs:
     container: devkitpro/devkita64:latest
     steps:
      - uses: actions/checkout@master
-  #  - name: make
-  #    run: make LATESTTAG=Beta
+    - name: make
+      run: make LATESTTAG=Beta
      - name: Upload build artifact
        uses: actions/upload-artifact@v1
        with:
         name: binary
-        path: release_build/HDR_Installer.nro
+        path: HDR_Installer.nro
   upload:
     if: "contains(github.event.head_commit.message, 'Release:')"
     runs-on: ubuntu-latest
@@ -32,4 +32,4 @@ jobs:
         body: HDR-Installer
         prerelease: false
         recreate: true
-        assets: binary/release_build/HDR_Installer.nro:HDR_Installer.nro:application/octet-stream
+        assets: binary/HDR_Installer.nro:HDR_Installer.nro:application/octet-stream

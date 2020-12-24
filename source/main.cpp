@@ -13,7 +13,7 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
     int num_entries = menu->child_count;
 
     /* Scroll up */
-    if (kDown & HidNpadButton_AnyUp) {
+    if (kDown & KEY_UP) {
         selected = (selected-1) % num_entries;
         if (selected < 0) {
             selected += num_entries;
@@ -21,12 +21,12 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
         menu->selected = selected;
     }
     /* Scroll down */
-    else if (kDown & HidNpadButton_AnyDown) {
+    else if (kDown & KEY_DOWN) {
         selected = abs((selected+1) % num_entries);
         menu->selected = selected;
     }
     /* Select */
-    else if (kDown & HidNpadButton_A) {
+    else if (kDown & KEY_A) {
         if (!menu->is_strings && num_entries > 0 && selected >= 0 && selected < num_entries && menu->children.submenus->at(selected)->child_count > 0) {
             menu->selected = 0;
             menu = menu->children.submenus->at(selected);
@@ -44,7 +44,7 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
         }
     }
     /* Back out */
-    else if (kDown & HidNpadButton_B) {
+    else if (kDown & KEY_B) {
         if (menu->parent != nullptr) {
             menu->selected = 0;
             menu = menu->parent;
@@ -52,19 +52,19 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
         }
     }
     /* Launch smash */
-    else if (kDown & HidNpadButton_X) {
+    else if (kDown & KEY_X) {
         printf(GREEN "Launching smash..." RESET);
         appletRequestLaunchApplication(0x01006A800016E000, NULL);
     }
 
     /* Insult the user & lock them in an infinite loop if they use the Poké Ball Plus controller */
-    else if (kDown & HidNpadButton_Palma) {
+    /*else if (kDown & HidNpadButton_Palma) {
         while (true) {
             printf(RED "Why tf do you have one of these things" RESET);
             consoleUpdate(NULL);
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }  
-    }
+    }*/
 }
 
 void setup(Menu* addons_menu, Menu* uninstall_menu) {
@@ -140,9 +140,9 @@ int main(int argc, char **argv)
     setup(&addons_menu, &uninstall_menu);
 
     /* Init hid stuff */
-    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
-    PadState pad;
-    padInitializeDefault(&pad);
+    //padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+    //PadState pad;
+    //padInitializeDefault(&pad);
 
     console_init();
     console_set_status("\n" MAGENTA "\t\t\t\t\t\t\t\t\tHDR Installer Ver. " APP_VERSION WHITE "\t\t\t\tPress + to exit" RESET);
@@ -150,9 +150,11 @@ int main(int argc, char **argv)
     while(appletMainLoop())
     {
         consoleClear();
-        padUpdate(&pad);
+        //padUpdate(&pad);
+        hidScanInput();
 
-        u64 kDown = padGetButtonsDown(&pad);
+        //u64 kDown = padGetButtonsDown(&pad);
+        u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
 
         if(kDown & HidNpadButton_Plus) break; // break in order to return to hbmenu
 
