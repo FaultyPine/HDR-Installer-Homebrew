@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 
 #define HDR_RELEASES_URL      "https://github.com/FaultyPine/HDR-Release/releases/download/beta/"
 #define HDR_ADDONS_LIST_URL   "https://github.com/FaultyPine/HDR-Release/releases/download/beta/HDR-Addons-List.txt"
-#define HDR_INSTALLER_URL     "https://github.com/FaultyPine/HDR-Installer-Homebrew/releases/download/beta/HDR_Installer.nro"
+#define HDR_INSTALLER_URL     "https://github.com/FaultyPine/HDR-Installer-Homebrew/releases/download/Release/HDR_Installer.nro"
 
 #define NUM_PROGRESS_CHARS 50
 

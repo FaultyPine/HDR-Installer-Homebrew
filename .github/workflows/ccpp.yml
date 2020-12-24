@@ -30,7 +30,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Release
         code: Release
-        body: HDR-Installer
+        body: A homebrew application to install/manage HDR! Please report any bugs in the issues page of this repo.
         prerelease: false
         recreate: true
         assets: binary/HDR_Installer.nro:HDR_Installer.nro:application/octet-stream
