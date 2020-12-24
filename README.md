@@ -5,8 +5,9 @@ Big thanks to Genwald and all contributors to [UltimateModManager](https://githu
 
 
 
-## Build from source
-Need:
-- [A DEVKITPRO environment](https://devkitpro.org/wiki/Getting_Started)
+# Build
 
-Then simply build with the command `make`.
+Install [Devkitpro](https://devkitpro.org/wiki/Getting_Started).
+
+ Using pacman (installed with devkitpro) install the following libraries:
+* switch-curl
