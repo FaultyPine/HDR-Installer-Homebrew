@@ -33,7 +33,12 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
             menu->selected = 0;
             if (menu->is_strings) {
                 /* If our currently selected menu has no submenus, then we want to do the thing related to that menu */
-                menu->handle_menu();
+                if (strcmp(menu->title, "HDR-Installer") == 0) {
+                    downloadFile(HDR_INSTALLER_URL, "sdmc:/switch/HDR_Installer.nro");
+                }
+                else {
+                    menu->handle_menu();
+                }
                 menu = menu->parent;
             }
         }
@@ -119,8 +124,13 @@ int main(int argc, char **argv)
     vector<Menu*> uninstall_submenus = { &u_hdr_base };
     Menu uninstall_menu("Uninstall", &uninstall_submenus);
 
+    /* Update ourselves */
+    Menu update_app("HDR-Installer", &download_msg_vec, None);
+    vector<Menu*> update_app_submenu = { &update_app };
+    Menu update_app_menu("Update HDR-Installer", &update_app_submenu);
+
     /* Main Menu */
-    vector<Menu*> main_submenus = { &install_menu, &addons_menu, &uninstall_menu };
+    vector<Menu*> main_submenus = { &install_menu, &addons_menu, &uninstall_menu, &update_app_menu };
     Menu main_menu("Main Menu", &main_submenus);
 
     /* Our current menu */

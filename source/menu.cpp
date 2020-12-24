@@ -80,7 +80,7 @@ void Menu::handle_menu() {
             consoleClear();
             fs::remove(zip_path);
         }
-        printf(GREEN "Download complete!" RESET);
+        printf(GREEN "Installation complete!" RESET);
         consoleUpdate(NULL);
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
