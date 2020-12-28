@@ -29,7 +29,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Release
-        code: Release
+        code: beta
         body: A homebrew application to install/manage HDR! Please report any bugs in the issues page of this repo.
         prerelease: false
         recreate: true
