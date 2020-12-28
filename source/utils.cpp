@@ -1,9 +1,17 @@
 #include "utils.h"
 
 
-void pauseForText() {
+void pauseForText(int seconds) {
     consoleUpdate(NULL);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
+    this_thread::sleep_for(chrono::seconds(seconds));
+}
+
+int indexOfCharVec(vector<char*> vector, char *data) {
+
+   return (std::find(vector.begin(), vector.end(), data) != vector.end()) //Is it in the vector ?
+           ?
+           std::distance(vector.begin(), std::find(vector.begin(), vector.end(), data)) //Yes, take the distance (C++11 and above, see the previous answers)
+           : -1; //No, return -1
 }
 
 void print_progress(size_t progress, size_t max) {
@@ -42,13 +50,20 @@ int download_progress(void* ptr, double TotalToDownload, double NowDownloaded,
 {
     consoleClear();
     print_progress( (int)((NowDownloaded/TotalToDownload)*100.0), 100 ); // percent out of 100
-    consoleUpdate(NULL);
+    printf("\nPress B to cancel\n");
 
+    hidScanInput();
+    u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
+    if (kDown & KEY_B) {
+        return 1;
+    }
+
+    consoleUpdate(NULL);
     // if you don't return 0, the transfer will be aborted
     return 0; 
 }
 
-bool downloadFile(const char* url, const char* path) {
+bool downloadFile(const char* url, const char* path, bool print_progress) {
     bool ret = true;
     CURL *curl;
     CURLcode res;
@@ -66,8 +81,10 @@ bool downloadFile(const char* url, const char* path) {
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-        curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, download_progress);
+        if (print_progress) {
+            curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+            curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, download_progress);
+        }
 
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, dest);
 
@@ -85,7 +102,7 @@ bool downloadFile(const char* url, const char* path) {
     else {
         printf("Curl init failed!");
         consoleUpdate(NULL);
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        this_thread::sleep_for(chrono::seconds(2));
     }
     curl_global_cleanup();
     return ret;

@@ -3,12 +3,10 @@
 #include <iostream>
 #include <fstream>
 
-const char* standard_download_msg_start = "Downloading...";
-const char* standard_uninstall_msg_start = "Uninstalling...";
-vector<const char*> download_msg_vec{standard_download_msg_start};
-vector<const char*> uninstall_msg_vec{standard_uninstall_msg_start};
+bool mainMenuLoop(u64 kDown, Menu*& menu) { // return true when you want to exit the app
+    /* return true in order to return to hbmenu */
+    if(kDown & KEY_PLUS) return true;
 
-void mainMenuLoop(u64 kDown, Menu*& menu) {
     int selected = menu->selected;
     int num_entries = menu->child_count;
 
@@ -27,20 +25,15 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
     }
     /* Select */
     else if (kDown & KEY_A) {
-        if (!menu->is_strings && num_entries > 0 && selected >= 0 && selected < num_entries && menu->children.submenus->at(selected)->child_count > 0) {
+        /* If our currently selected menu has submenus, enter the submenu that is currently selected */
+        if (menu->children.submenus->at(selected)->has_submenus) {
             menu->selected = 0;
             menu = menu->children.submenus->at(selected);
             menu->selected = 0;
-            if (menu->is_strings) {
-                /* If our currently selected menu has no submenus, then we want to do the thing related to that menu */
-                if (strcmp(menu->title, "HDR-Installer") == 0) {
-                    downloadFile(HDR_INSTALLER_URL, "sdmc:/switch/HDR_Installer.nro");
-                }
-                else {
-                    menu->handle_menu();
-                }
-                menu = menu->parent;
-            }
+        }
+        /* If our currently selected menu has no submenus, then we want to do the thing related to that menu */
+        else {
+            if (menu->children.submenus->at(selected)->handle_menu()) return true; // this returns true when we update ourselves and want to restart
         }
     }
     /* Back out */
@@ -53,7 +46,7 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
     }
     /* Launch smash */
     else if (kDown & KEY_X) {
-        printf(GREEN "Launching smash..." RESET);
+        printf(GREEN "Launching smash... Please be patient, your switch hasn't froze, it's just loading. First time boot of HDR may take a minute or two." RESET);
         appletRequestLaunchApplication(0x01006A800016E000, NULL);
     }
 
@@ -65,6 +58,8 @@ void mainMenuLoop(u64 kDown, Menu*& menu) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }  
     }*/
+
+    return false;
 }
 
 void setup(Menu* addons_menu, Menu* uninstall_menu) {
@@ -78,8 +73,14 @@ void setup(Menu* addons_menu, Menu* uninstall_menu) {
         }
     }
 
+    /* Remove already existing hdr-addons-list (to ensure we get the right one? Is this even necessary?) */
+    const char* hdr_addons_list_path = HDR_INSTALLER_PATH "HDR-Addons-List.txt";
+    if (fs::exists(hdr_addons_list_path)) {
+        fs::remove(hdr_addons_list_path);
+    }
+
     /* Download addons list file to installer directory */
-    if (downloadFile(HDR_ADDONS_LIST_URL, HDR_INSTALLER_PATH "HDR-Addons-List.txt")) {
+    if (downloadFile(HDR_ADDONS_LIST_URL, hdr_addons_list_path, false)) {
         /* read addons list file */
         fstream addons_list(HDR_INSTALLER_PATH "/HDR-Addons-List.txt", ios::in);
         if (addons_list.is_open()) {
@@ -87,17 +88,19 @@ void setup(Menu* addons_menu, Menu* uninstall_menu) {
             while(getline(addons_list, line)) {
                 /* push each addon onto addons_submenus and uninstall_submenus vectors */
 
-                Menu* curr_addons_addition = new Menu(line.c_str(), &download_msg_vec, Download);
+                string url = HDR_RELEASES_URL;
+                url += line.c_str();
+                url += ".zip";
+
+                Menu* curr_addons_addition = new Menu(line.c_str(), Download, line.c_str(), url.c_str());
                 curr_addons_addition->parent = addons_menu;
-                Menu* curr_uninstall_addition = new Menu(line.c_str(), &uninstall_msg_vec, Uninstall);
+                Menu* curr_uninstall_addition = new Menu(line.c_str(), Uninstall, line.c_str());
                 curr_uninstall_addition->parent = uninstall_menu;
 
-                Menu* addons_menuptr = curr_addons_addition;
-                addons_menu->children.submenus->push_back(addons_menuptr);
+                addons_menu->children.submenus->push_back(curr_addons_addition);
                 addons_menu->child_count += 1;
                 
-                Menu* uninstall_menuptr = curr_uninstall_addition;
-                uninstall_menu->children.submenus->push_back(uninstall_menuptr);
+                uninstall_menu->children.submenus->push_back(curr_uninstall_addition);
                 uninstall_menu->child_count += 1;
             }
         }
@@ -108,26 +111,26 @@ void setup(Menu* addons_menu, Menu* uninstall_menu) {
 int main(int argc, char **argv)
 {
     socketInitializeDefault();
+    console_init();
+    console_set_status("\n" RED "X" RESET " to launch smash" MAGENTA "\t\t\t\tHDR Installer Ver. " APP_VERSION WHITE "\t\t\t\t\t" RED "+" RESET " to exit" RESET);
     //nxlinkStdio();    // Redirect stdout and stderr over the network to nxlink
 
     /* Install HDR */
-    Menu hdr_base("HDR-Base", &download_msg_vec, Download);
-    vector<Menu*> install_submenus = { &hdr_base };
-    Menu install_menu ("Install HDR", &install_submenus);
+    string url = HDR_RELEASES_URL;
+    url += "HDR-Base.zip";
+    Menu install_menu ("Install HDR", Download, "HDR-Base", url.c_str());
 
     /* Addons */
     vector<Menu*> addons_submenus = { };
     Menu addons_menu("Addons", &addons_submenus);
 
     /* Uninstall */
-    Menu u_hdr_base("HDR-Base", &uninstall_msg_vec, Uninstall);
+    Menu u_hdr_base("HDR-Base", Uninstall, "HDR-Base");
     vector<Menu*> uninstall_submenus = { &u_hdr_base };
     Menu uninstall_menu("Uninstall", &uninstall_submenus);
 
     /* Update ourselves */
-    Menu update_app("HDR-Installer", &download_msg_vec, None);
-    vector<Menu*> update_app_submenu = { &update_app };
-    Menu update_app_menu("Update HDR-Installer", &update_app_submenu);
+    Menu update_app_menu("Update HDR-Installer", Download, "HDR-Installer", HDR_INSTALLER_URL);
 
     /* Main Menu */
     vector<Menu*> main_submenus = { &install_menu, &addons_menu, &uninstall_menu, &update_app_menu };
@@ -144,24 +147,19 @@ int main(int argc, char **argv)
     //PadState pad;
     //padInitializeDefault(&pad);
 
-    console_init();
-    console_set_status("\n" MAGENTA "\t\t\t\t\t\t\t\t\tHDR Installer Ver. " APP_VERSION WHITE "\t\t\t\tPress + to exit" RESET);
-
     while(appletMainLoop())
     {
         consoleClear();
         //padUpdate(&pad);
+
+        /* Using deprecated HID stuff since devkit's docker image isn't up to date */
         hidScanInput();
 
         //u64 kDown = padGetButtonsDown(&pad);
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
 
-        if(kDown & KEY_PLUS) break; // break in order to return to hbmenu
-
         current_menu->printMenu();
-        mainMenuLoop(kDown, current_menu);
-
-        printf(WHITE "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPress X to launch smash" RESET);
+        if (mainMenuLoop(kDown, current_menu)) break;
 
         consoleUpdate(NULL);
     }

@@ -35,7 +35,7 @@ GITREV := $(shell git rev-parse HEAD 2>/dev/null)
 GITREV_SHORT := $(shell git rev-parse HEAD 2>/dev/null | cut -c1-8)
 LATESTTAG := $(shell git describe --tags $(shell git rev-list --tags --max-count=1 2>/dev/null) 2>/dev/null)
 
-APP_TITLE	:=	HDR_Installer
+APP_TITLE	:=	HDR Installer
 APP_AUTHOR	:=	PiNE
 ICON 	:= icon.jpg
 APP_VERSION	:=	$(LATESTTAG)
@@ -66,7 +66,7 @@ CFLAGS	:=	-g -Wall -O3 -ffunction-sections \
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -DVERSION_STRING="\"$(APP_VERSION)\""
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=c++17
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=c++20 -w # i know i know :((
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-no-as-needed,-Map,$(notdir $*.map)
