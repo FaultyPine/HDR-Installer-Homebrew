@@ -28,9 +28,9 @@ jobs:
       uses: Genwald/create-release@eba889c
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        name: Release
+        name: beta
         code: beta
-        body: A homebrew application to install/manage HDR! Please report any bugs in the issues page of this repo.
-        prerelease: false
+        body: Latest commit, automatically updated. May not be fully tested or fully working.
+        prerelease: true
         recreate: true
         assets: binary/HDR_Installer.nro:HDR_Installer.nro:application/octet-stream
