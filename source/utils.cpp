@@ -6,13 +6,6 @@ void pauseForText(int seconds) {
     this_thread::sleep_for(chrono::seconds(seconds));
 }
 
-int indexOfCharVec(vector<char*> vector, char *data) {
-
-   return (std::find(vector.begin(), vector.end(), data) != vector.end()) //Is it in the vector ?
-           ?
-           std::distance(vector.begin(), std::find(vector.begin(), vector.end(), data)) //Yes, take the distance (C++11 and above, see the previous answers)
-           : -1; //No, return -1
-}
 
 void print_progress(size_t progress, size_t max) {
     size_t prog_chars;
@@ -34,7 +27,7 @@ void print_progress(size_t progress, size_t max) {
     for (size_t i = 0; i < NUM_PROGRESS_CHARS - prog_chars; i++)
         printf(" ");
 
-    printf("]\t%lu/%lu\n" RESET, progress, max);
+    printf("]\t%lu%%\n" RESET, progress);
 }
 
 /*

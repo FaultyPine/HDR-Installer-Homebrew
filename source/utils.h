@@ -33,6 +33,4 @@ namespace fs = std::filesystem;
 
 void pauseForText(int seconds);
 
-int indexOfCharVec(vector<char*> vector, char *data);
-
 bool downloadFile(const char* url, const char* path, bool print_progress);
