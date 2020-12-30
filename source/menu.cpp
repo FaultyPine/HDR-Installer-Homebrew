@@ -87,14 +87,15 @@ void Menu::printMenu() {
                     string p = HDR_ROMFS_PATH;
                     p += children.submenus->at(i)->dl_name;
                     /* If the current menu iteration is installed, and has (non-default) data for both current_version and new_version, then we want to display version info */
-                    if (fs::exists(p) && strcmp(modinfo->current_version.c_str(), "0.0.0") != 0 && strcmp(modinfo->new_version.c_str(), "0.0.0") != 0) {
+                    if (fs::exists(p)) {
                         is_installed_menu = true;
-                        version_string = " [Ver. " + modinfo->current_version + "]";
-                        if (modinfo->current_version != modinfo->new_version && strcmp(title, "Uninstall") != 0) {
-                            version_string = " Update available! (Ver. " + modinfo->current_version + " -> " + modinfo->new_version + ")\n";
+                        if (strcmp(modinfo->current_version.c_str(), "0.0.0") != 0) {
+                            version_string = " [Ver. " + modinfo->current_version + "]";
+                            if (modinfo->current_version != modinfo->new_version && strcmp(modinfo->new_version.c_str(), "0.0.0") != 0 && strcmp(title, "Uninstall") != 0) {
+                                version_string = " Update available! (Ver. " + modinfo->current_version + " -> " + modinfo->new_version + ")\n";
+                            }
                         }
                     }
-
                 }
 
                 /* Behavior for the currently "selected" menu */
@@ -126,7 +127,7 @@ void Menu::printMenu() {
         }
         /* If the currently selected menu doesn't have submenus, and it's not the "update app" menu thing, print the description and author */
         if (!children.submenus->at(selected)->has_submenus && strcmp(children.submenus->at(selected)->dl_name, "HDR-Installer") != 0 && description != "" && author != "") {
-            printf(WHITE "\n\n\n\n\n\n\n\n\n\n%s\n\n%s" RESET, description.c_str(), author.c_str());
+            printf(WHITE "\n\n\n\n\n\n\n%s\n\n%s" RESET, description.c_str(), author.c_str());
         }
     }
 }
@@ -159,7 +160,7 @@ bool Menu::handle_menu() {
         string prev_installation_path = HDR_ROMFS_PATH;
         prev_installation_path += dl_name;
         if (fs::exists(prev_installation_path)) {
-            printf("\n\nRemoving previous installation of %s before downloading...\n", dl_name);
+            printf("\n\nRemoving previous installation of %s before downloading\n", dl_name);
             pauseForText(1);
             fsdevDeleteDirectoryRecursively(prev_installation_path.c_str());
         }
@@ -181,12 +182,6 @@ bool Menu::handle_menu() {
             consoleClear();
             fs::remove(zip_path);
 
-            /* Add mod_info_map entry after downloading to turn text blue/display version stuff */
-            if (!mods_info_map.contains(dl_name)) {
-                auto modinfo = &mods_info_map[dl_name];
-                modinfo->name = dl_name;
-            }
-
             printf(GREEN "\n\n\nInstallation complete!" RESET);
             consoleUpdate(NULL);
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -201,7 +196,7 @@ bool Menu::handle_menu() {
     else if (handle_menu_type == Uninstall) {
         string p = HDR_ROMFS_PATH;
         p += dl_name;
-        printf("\n\nUninstalling ");
+        printf("\n\n\nUninstalling ");
         consoleUpdate(NULL);
 
         /* remove HDR plugin if we're uninstalling HDR-Base...
@@ -220,10 +215,10 @@ bool Menu::handle_menu() {
             consoleUpdate(NULL);
             fsdevDeleteDirectoryRecursively(p.c_str());
 
-            printf(GREEN "Uninstalled successfully!\n" RESET);
+            printf(GREEN "\nUninstalled successfully!\n" RESET);
         }
         else {
-            printf(RED "Attempted to remove path that doesn't exist!\n" RESET);
+            printf(RED "\n\nAttempted to remove path that doesn't exist!\n" RESET);
         }
         pauseForText(3);
     }
