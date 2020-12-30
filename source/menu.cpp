@@ -181,6 +181,12 @@ bool Menu::handle_menu() {
             consoleClear();
             fs::remove(zip_path);
 
+            /* Add mod_info_map entry after downloading to turn text blue/display version stuff */
+            if (!mods_info_map.contains(dl_name)) {
+                auto modinfo = &mods_info_map[dl_name];
+                modinfo->name = dl_name;
+            }
+
             printf(GREEN "\n\n\nInstallation complete!" RESET);
             consoleUpdate(NULL);
             std::this_thread::sleep_for(std::chrono::seconds(1));
