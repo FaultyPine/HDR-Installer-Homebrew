@@ -1,11 +1,47 @@
 #include "utils.h"
 
-
 void pauseForText(int seconds) {
     consoleUpdate(NULL);
     this_thread::sleep_for(chrono::seconds(seconds));
 }
 
+int nthSubstr(int n, const string& s,
+              const string& p) {
+   string::size_type i = s.find(p);     // Find the first occurrence
+
+   int j;
+   for (j = 1; j < n && i != string::npos; ++j)
+      i = s.find(p, i+1); // Find the next occurrence
+
+   if (j == n)
+     return(i);
+   else
+     return(-1);
+}
+
+
+string get_current_mod_version(string dl_name) {
+    string path = HDR_ROMFS_PATH;
+    path += dl_name;
+    path += "/info.ini";
+
+    fstream file(path, ios::in);
+    if (file.is_open()) {
+        string line = "";
+        while(getline(file, line)) {
+            line.erase(std::remove(line.begin(), line.end(), '\n'), line.end()); // remove newline
+            line.erase(std::remove(line.begin(), line.end(), '\r'), line.end()); // remove carriage return
+            line.erase(std::remove(line.begin(), line.end(), ' '), line.end()); // remove whitespace
+
+            if (line.find("version=") != string::npos) { // if "version=" in line
+                string s = line.substr(line.find("version=")+8);
+                return s;
+            }
+        }
+    }
+    file.close();
+    return "0.0.0";
+}
 
 void print_progress(size_t progress, size_t max) {
     size_t prog_chars;
@@ -13,7 +49,7 @@ void print_progress(size_t progress, size_t max) {
     else prog_chars = ((float) progress / max) * NUM_PROGRESS_CHARS;
 
     printf("\n\n\n");
-    printf("Downloading...\n\n");
+    printf("Downloading... Please be patient\n\n");
     if (prog_chars < NUM_PROGRESS_CHARS) printf(YELLOW);
     else printf(GREEN);
 
@@ -85,7 +121,7 @@ bool downloadFile(const char* url, const char* path, bool print_progress) {
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            printf("curl_easy_perform failed: %s\n", curl_easy_strerror(res));
+            printf("\ncurl_easy_perform failed: %s\n", curl_easy_strerror(res));
             ret = false;
         }
 

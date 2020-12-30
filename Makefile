@@ -66,7 +66,7 @@ CFLAGS	:=	-g -Wall -O3 -ffunction-sections \
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -DVERSION_STRING="\"$(APP_VERSION)\""
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=c++20 -w # i know i know :((
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=c++20 -Wno-deprecated-declarations
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-no-as-needed,-Map,$(notdir $*.map)

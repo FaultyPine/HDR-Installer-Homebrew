@@ -1,7 +1,5 @@
 #include "menu.h"
 #include "utils.h"
-#include <iostream>
-#include <fstream>
 
 bool mainMenuLoop(u64 kDown, Menu*& menu) { // return true when you want to exit the app
     /* return true in order to return to hbmenu */
@@ -64,15 +62,6 @@ bool mainMenuLoop(u64 kDown, Menu*& menu) { // return true when you want to exit
 
 void setup(Menu* addons_menu, Menu* uninstall_menu) {
 
-    /* Make sure important paths exists */
-    vector<const char*> paths_to_make = {HDR_INSTALLER_PATH, HDR_ROMFS_PATH};
-    for(const char* c: paths_to_make) {
-        fs::path installer_path(c);
-        if (!fs::exists(c)) {
-            fs::create_directories(c);
-        }
-    }
-
     /* Remove already existing hdr-addons-list (to ensure we get the right one? Is this even necessary?) */
     const char* hdr_addons_list_path = HDR_INSTALLER_PATH "HDR-Addons-List.txt";
     if (fs::exists(hdr_addons_list_path)) {
@@ -82,26 +71,36 @@ void setup(Menu* addons_menu, Menu* uninstall_menu) {
     /* Download addons list file to installer directory */
     if (downloadFile(HDR_ADDONS_LIST_URL, hdr_addons_list_path, false)) {
         /* read addons list file */
-        fstream addons_list(HDR_INSTALLER_PATH "/HDR-Addons-List.txt", ios::in);
+        fstream addons_list(HDR_INSTALLER_PATH "HDR-Addons-List.txt", ios::in);
         if (addons_list.is_open()) {
-            string line;
+            string line = "";
             while(getline(addons_list, line)) {
                 /* push each addon onto addons_submenus and uninstall_submenus vectors */
 
-                string url = HDR_RELEASES_URL;
-                url += line.c_str();
-                url += ".zip";
+                /* parse string for dl_name */
+                string dl_name = line.substr(0, line.find(" ::"));
 
-                Menu* curr_addons_addition = new Menu(line.c_str(), Download, line.c_str(), url.c_str());
-                curr_addons_addition->parent = addons_menu;
-                Menu* curr_uninstall_addition = new Menu(line.c_str(), Uninstall, line.c_str());
-                curr_uninstall_addition->parent = uninstall_menu;
+                /* Special case checks for anything we have in the addons list that we don't want in the addons menu */
+                if (dl_name != "HDR-Base") {
+                    string url = HDR_RELEASES_URL;
+                    url += dl_name;
+                    url += ".zip";
 
-                addons_menu->children.submenus->push_back(curr_addons_addition);
-                addons_menu->child_count += 1;
+                    Menu* curr_addons_addition = new Menu(dl_name.c_str(), Download, dl_name.c_str(), url.c_str());
+                    curr_addons_addition->parent = addons_menu;
+                    Menu* curr_uninstall_addition = new Menu(dl_name.c_str(), Uninstall, dl_name.c_str());
+                    curr_uninstall_addition->parent = uninstall_menu;
+
+                    addons_menu->children.submenus->push_back(curr_addons_addition);
+                    addons_menu->child_count += 1;
+                    
+                    uninstall_menu->children.submenus->push_back(curr_uninstall_addition);
+                    uninstall_menu->child_count += 1;
+
+                }
+                /* Takes in a line of the addons-list file and parses it, distributing relevant info to mods_info_map in menu.cpp */
+                parse_addons_list_info_by_line(line);
                 
-                uninstall_menu->children.submenus->push_back(curr_uninstall_addition);
-                uninstall_menu->child_count += 1;
             }
         }
         addons_list.close();
@@ -110,10 +109,34 @@ void setup(Menu* addons_menu, Menu* uninstall_menu) {
 
 int main(int argc, char **argv)
 {
+    /* Make sure important paths exists */
+    vector<const char*> paths_to_make = {HDR_INSTALLER_PATH, HDR_ROMFS_PATH};
+    for(const char* c: paths_to_make) {
+        fs::path installer_path(c);
+        if (!fs::exists(c)) {
+            fs::create_directories(c);
+        }
+    }
+
+    /* Init shtuff */
     socketInitializeDefault();
     console_init();
     console_set_status("\n" RED "X" RESET " to launch smash" MAGENTA "\t\t\t\tHDR Installer Ver. " APP_VERSION WHITE "\t\t\t\t\t" RED "+" RESET " to exit" RESET);
     //nxlinkStdio();    // Redirect stdout and stderr over the network to nxlink
+
+    /* Check for a valid internet connection as early as possible */
+    if (downloadFile("https://example.com/", "sdmc:/internet_test.bruh", false)) {
+        fs::remove("sdmc:/internet_test.bruh");
+    }
+    else {
+        fs::remove("sdmc:/internet_test.bruh");
+        printf(RED "\n\n\nCannot connect to internet! This app requires an internet connection. \nMaybe you have airplane mode on?\n" RESET);
+        pauseForText(8);
+        /* Cleanup */
+        console_exit();
+        socketExit();
+        return 0;
+    }
 
     /* Install HDR */
     string url = HDR_RELEASES_URL;
@@ -152,18 +175,22 @@ int main(int argc, char **argv)
         consoleClear();
         //padUpdate(&pad);
 
-        /* Using deprecated HID stuff since devkit's docker image isn't up to date */
+        /* Using deprecated HID stuff since devkit's docker image isn't up to date, and I rely on that for gh actions */
         hidScanInput();
 
         //u64 kDown = padGetButtonsDown(&pad);
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
 
+        /* Print current menu */
         current_menu->printMenu();
+        /* Main menu loop that polls inputs and generally deals with menus. If this returns true, we break, exiting the app */
         if (mainMenuLoop(kDown, current_menu)) break;
 
         consoleUpdate(NULL);
     }
+
+    /* Cleanup */
     console_exit();
-    socketExit();      // Cleanup
+    socketExit();      
     return 0;
 }

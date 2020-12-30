@@ -10,9 +10,11 @@ enum HandleMenuType {
 };
 
 struct ModInfo {
-    string version;
+    string new_version;
+    string current_version;
     string description;
     string name;
+    string author;
 };
 
 struct Menu {
@@ -31,7 +33,7 @@ struct Menu {
             vector<const char*>* substrings;
         } children;
 
-        Menu(char* _title, vector<Menu*>* _submenus);
+        Menu(const char* _title, vector<Menu*>* _submenus);
         Menu(const char* _title, HandleMenuType _handle_menu_type, const char* _dl_name, const char* _url = "");
         ~Menu();
 
@@ -42,3 +44,5 @@ struct Menu {
         void printMenu();
         void set_menu_body(vector<const char*> _body);
 };
+
+void parse_addons_list_info_by_line(string line);

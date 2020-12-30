@@ -11,6 +11,8 @@
 #include <thread>
 #include <chrono>  
 #include <algorithm>
+#include <fstream>
+#include "menu.h"
 extern "C" {
     #include "console.h"
 }
@@ -32,5 +34,9 @@ namespace fs = std::filesystem;
 
 
 void pauseForText(int seconds);
+
+int nthSubstr(int n, const string& s, const string& p);
+
+string get_current_mod_version(string dl_name);
 
 bool downloadFile(const char* url, const char* path, bool print_progress);
