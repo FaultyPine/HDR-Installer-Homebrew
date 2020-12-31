@@ -10,7 +10,7 @@ https://github.com/FaultyPine/HDR-Release
 Feel free to submit a PR with your own romfs mod there to have it featured on the installer!
   
 # Usage
-To use this app, simply download the HDR_Installer.nro file from the releases page of this repo, and put that file in your "switch" folder on your SD card. Then open the homebrew menu and select the app.
+To use this app, simply download the HDR_Installer.nro file from the [releases page of this repo](https://github.com/FaultyPine/HDR-Installer-Homebrew/releases), and put that file in your "switch" folder on your SD card. Then open the homebrew menu and select the app.
   
   
 # Build
