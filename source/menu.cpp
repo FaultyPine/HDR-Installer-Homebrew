@@ -182,6 +182,11 @@ bool Menu::handle_menu() {
             consoleClear();
             fs::remove(zip_path);
 
+            if (mods_info_map.contains(dl_name)) {
+                auto mod_info = &mods_info_map[dl_name];
+                mod_info->current_version = get_current_mod_version(dl_name);
+            }
+
             printf(GREEN "\n\n\nInstallation complete!" RESET);
             consoleUpdate(NULL);
             std::this_thread::sleep_for(std::chrono::seconds(1));
