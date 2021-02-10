@@ -10,6 +10,7 @@ struct GhDownload {
     gh::OauthToken token;
     std::string repository;
     std::string tag;
+    std::filesystem::path path;
     //bool is_downloaded;
 };
 

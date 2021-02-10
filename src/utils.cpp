@@ -305,7 +305,7 @@ namespace gh {
 
                 std::filesystem::path url = assets[i].url;
 
-                std::string path = filepath_root + url.filename().string();
+                std::string path = filepath_root + assets[i].filename;
                 FILE* file = fopen(path.c_str(), "wb"); // using C file IO because that is what CURL requires
 
                 if (assets.size() > 1)
@@ -338,9 +338,11 @@ namespace gh {
                     consoleClear();
                     std::filesystem::remove(path);
                 }
-                else { // otherwise, just rename the file to it's proper name instead of it's asset id
-                    std::filesystem::path new_path = filepath_root + assets[i].filename;
-                    rename(path.c_str(), new_path.c_str());
+                if (repository == APP_REPO) {
+                    std::cout << GREEN "Update complete! Restarting app...\n" RESET;
+                    pauseForText(1);
+                    envSetNextLoad(APP_NRO_PATH, APP_NRO_PATH);
+                    is_restart = true;
                 }
             }
             ret = DownloadResult::SUCCESS;

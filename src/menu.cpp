@@ -99,7 +99,7 @@ void downloadableFocus(TreeNode* node) {
     }*/
 
     time_t seconds = time(NULL);
-    gh::DownloadResult dl = gh::downloadRelease(downloadable.download.token, downloadable.download.repository, downloadable.download.tag);
+    gh::DownloadResult dl = gh::downloadRelease(downloadable.download.token, downloadable.download.repository, downloadable.download.tag, downloadable.download.path);
 
     std::cout << "\n";
     switch (dl) {
@@ -139,13 +139,15 @@ void downloadableFocus(TreeNode* node) {
             break;
     }
 
-    std::cout << WHITE "\n\nPress B to exit.\n" RESET;
-    consoleUpdate(NULL);
-    u64 k;
-    do {
-        hidScanInput();
-        k = hidKeysDown(CONTROLLER_P1_AUTO);
-    } while (!(k & KEY_B));
+    if (!is_restart) {
+        std::cout << WHITE "\n\nPress B to exit.\n" RESET;
+        consoleUpdate(NULL);
+        u64 k;
+        do {
+            hidScanInput();
+            k = hidKeysDown(CONTROLLER_P1_AUTO);
+        } while (!(k & KEY_B));
+    }
 
 }
 

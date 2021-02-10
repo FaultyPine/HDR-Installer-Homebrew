@@ -10,6 +10,7 @@ static struct {
     bool isDeveloper;
 } user;
 //json installed_json;
+bool is_restart = false;
 
 
 void CreateReleasesMenu(TreeNode* start, std::vector<std::string>* entries, const std::string releases_name, const std::string REPO) {
@@ -27,7 +28,7 @@ void CreateReleasesMenu(TreeNode* start, std::vector<std::string>* entries, cons
 
         for (size_t i = 0; i < releases.size(); i++) {
             //bool is_installed = installed_json["Installed"].contains(releases[i].name);
-            const GhDownload dl = {user.token, REPO, releases[i].tag/*, is_installed*/};
+            const GhDownload dl = {user.token, REPO, releases[i].tag, SYSTEM_ROOT/*, is_installed*/};
             makeDownloadable(start->GetChild(start->GetChildCount()-1)->SpawnChild(), releases[i].name, releases[i].body, dl);
         }
     }
@@ -71,8 +72,11 @@ int main(int argc, char** argv) {
     if (user.isDeveloper) {
         CreateReleasesMenu(&start, &entries, "HDR-Dev", DEV_REPO);
     }
+    makeDownloadable(start.SpawnChild(), "Update HDR-Installer", "", {user.token, APP_REPO, "beta", "sdmc:/switch/"});
+    entries.push_back("Update HDR-Installer");
+
     makeMenu(&start, "Main Menu", entries);
-    while (appletMainLoop()) {
+    while (appletMainLoop() && !is_restart) {
         consoleClear();
         hidScanInput();
         TreeNode* current = viewer.GetCurrent();

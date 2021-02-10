@@ -25,8 +25,9 @@ using json = nlohmann::json;
 #define START_BREAKABLE do {
 #define END_BREAKABLE   } while (false);
 
-static constexpr char* APP_VERSION    = "1.5.0";
+static constexpr char* APP_VERSION    = "1.5.1";
 static constexpr char* APP_PATH       = "sdmc:/switch/HDR_Installer/";
+static constexpr char* APP_NRO_PATH   = "sdmc:/switch/HDR_Installer.nro";
 static constexpr char* MODS_FOLDER    = "sdmc:/ultimate/mods/";
 //static constexpr char* INSTALLED_MODS = "sdmc:/switch/HDR_Installer/Installed.json";
 //static constexpr char* TMP_EXTRACTED  = "sdmc:/TempExtractedFiles";
@@ -69,12 +70,13 @@ namespace gh {
     bool isDeveloper(OauthToken token);
 
     std::vector<Release> getReleases(OauthToken token, const std::string& repository);
-    DownloadResult downloadRelease(OauthToken token, const std::string& repository, const std::string& tag, const std::string& filepath_root = SYSTEM_ROOT);
+    DownloadResult downloadRelease(OauthToken token, const std::string& repository, const std::string& tag, const std::string& filepath_root);
 }
 void pauseForText(int seconds = 3);
 gh::OauthToken loadOauthToken();
 void destroyOauthToken(gh::OauthToken token);
 void prep();
+extern bool is_restart;
 /*
 extern json installed_json;
 void SaveJson(json j_obj = installed_json, std::filesystem::path path = INSTALLED_MODS);

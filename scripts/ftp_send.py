@@ -1,7 +1,7 @@
 from ftplib import FTP
 import os, sys
 
-consoleIP = ""
+consoleIP = "192.168.137.72"
 plugin_name = "HDR_Installer.nro"
 
 
