@@ -37,7 +37,6 @@ void CreateReleasesMenu(TreeNode* start, std::vector<std::string>* entries, cons
 const std::string console_status = "\n" RED "X" RESET " to launch smash" MAGENTA "\t\t\t\tHDR Installer Ver. " + std::string(APP_VERSION) + WHITE "\t\t\t\t\t" RED "+" RESET " to exit" RESET;
 
 int main(int argc, char** argv) {
-    appletSetCpuBoostMode(ApmCpuBoostMode_FastLoad);
     user.token = nullptr;
     user.isEndUser = false;
     user.isBetaTester = false;
@@ -73,7 +72,6 @@ int main(int argc, char** argv) {
         CreateReleasesMenu(&start, &entries, "HDR-Dev", DEV_REPO);
     }
     makeMenu(&start, "Main Menu", entries);
-    appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
     while (appletMainLoop()) {
         consoleClear();
         hidScanInput();
