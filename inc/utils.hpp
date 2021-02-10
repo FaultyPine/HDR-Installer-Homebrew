@@ -25,7 +25,7 @@ using json = nlohmann::json;
 #define START_BREAKABLE do {
 #define END_BREAKABLE   } while (false);
 
-static constexpr char* APP_VERSION    = "1.5.1";
+static constexpr char* APP_VERSION    = "1.5.2";
 static constexpr char* APP_PATH       = "sdmc:/switch/HDR_Installer/";
 static constexpr char* APP_NRO_PATH   = "sdmc:/switch/HDR_Installer.nro";
 static constexpr char* MODS_FOLDER    = "sdmc:/ultimate/mods/";
