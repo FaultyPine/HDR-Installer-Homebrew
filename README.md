@@ -1,6 +1,8 @@
 # HDR Installer
   
 Big thanks to Genwald and all contributors to [UltimateModManager](https://github.com/ultimate-research/UltimateModManager). This codebase is based off that project, and without it, we wouldn't be where we are today. Thanks!
+
+Another massive thanks to [Blujay](https://twitter.com/jayblu_), who rewrote this entire project for the better, helped me out with it on numerous occasions, and is in general an absolute chad.
   
 This installer installs mods from this repository
 https://github.com/FaultyPine/HDR-Release

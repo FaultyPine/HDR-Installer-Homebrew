@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef _3DS
 #include <3ds.h>
 #elif defined(__SWITCH__)
@@ -43,3 +47,7 @@ __attribute__((format(printf,1,2)))
 void debug_print(const char *fmt, ...);
 
 void console_render(void);
+
+#ifdef __cplusplus
+}
+#endif
