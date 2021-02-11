@@ -36,6 +36,7 @@ static constexpr char* SKYLINE_PATH   = "sdmc:/atmosphere/contents/01006A800016E
 static constexpr char* RELEASE_REPO   = "blu-dev/HDR-Release-Builds";
 static constexpr char* BETA_REPO      = "blu-dev/HDR-Beta-Builds";
 static constexpr char* DEV_REPO       = "blu-dev/HDR-Dev-Builds";
+static constexpr char* ADDONS_REPO    = "FaultyPine/HDR-Addons";
 static constexpr char* APP_REPO       = "FaultyPine/HDR-Installer-Homebrew";
 
 static constexpr char* OAUTH_FILE   = "oauth.txt";

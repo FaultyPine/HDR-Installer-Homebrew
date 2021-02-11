@@ -65,6 +65,7 @@ int main(int argc, char** argv) {
     std::vector<std::string> entries;
     if (user.isEndUser) {
         CreateReleasesMenu(&start, &entries, "HDR", RELEASE_REPO);
+        CreateReleasesMenu(&start, &entries, "HDR-Addons", ADDONS_REPO);
     }
     if (user.isBetaTester) {
         CreateReleasesMenu(&start, &entries, "HDR-Beta", BETA_REPO);

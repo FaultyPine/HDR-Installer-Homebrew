@@ -76,9 +76,7 @@ void menuFocus(TreeNode* node) {
         for (size_t i = 0; i < child_count; i++) {
             if (menu.selected == i)
                 std::cout << GREEN "--> " CYAN;
-            std::cout << menu.entries[i] << std::endl;
-            if (menu.selected == i)
-                std::cout << RESET;
+            std::cout << menu.entries[i] << RESET << std::endl;
         }
         TreeNode* child = node->GetChild(menu.selected);
         if (checkType(child) == NodeType::DOWNLOADABLE) {
