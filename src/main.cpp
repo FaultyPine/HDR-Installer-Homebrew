@@ -10,7 +10,7 @@ static struct {
     bool isDeveloper;
 } user;
 //json installed_json;
-bool is_restart = false;
+bool is_exit_app = false;
 
 
 void CreateReleasesMenu(TreeNode* start, std::vector<std::string>* entries, const std::string releases_name, const std::string REPO) {
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
     entries.push_back("Update HDR-Installer");
 
     makeMenu(&start, "Main Menu", entries);
-    while (appletMainLoop() && !is_restart) {
+    while (appletMainLoop() && !is_exit_app) {
         consoleClear();
         hidScanInput();
         TreeNode* current = viewer.GetCurrent();

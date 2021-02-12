@@ -96,14 +96,24 @@ void downloadableFocus(TreeNode* node) {
         downloadable.download.is_downloaded = false;
     }*/
 
+    /* disable screen dimming and auto sleep. */
+    appletSetMediaPlaybackState(true);
+    /* Disables short-press of the home button (only works in application mode) */
+    appletBeginBlockingHomeButton(0);
+
     time_t seconds = time(NULL);
     gh::DownloadResult dl = gh::downloadRelease(downloadable.download.token, downloadable.download.repository, downloadable.download.tag, downloadable.download.path);
+    
+    appletSetMediaPlaybackState(false);
+    appletEndBlockingHomeButton();
 
     std::cout << "\n";
     switch (dl) {
         case gh::DownloadResult::SUCCESS: {
             //downloadable.download.is_downloaded = true;
-            std::cout << GREEN "\n\nSuccessfully installed: " RESET << downloadable.title << "\n\nTime elapsed: " << time(NULL) - seconds << " seconds\n";
+            int seconds_elapsed = time(NULL) - seconds;
+            std::string formatted_time = std::to_string(seconds_elapsed / 60) + " minutes, and " + std::to_string(seconds_elapsed % 60) + " seconds.\n";
+            std::cout << GREEN "\n\nSuccessfully installed: " RESET << downloadable.title << "\n\nTime elapsed: " << formatted_time;
             /*
             std::vector<std::pair<std::string, bool>> files;
             for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(TMP_EXTRACTED)) {
@@ -137,7 +147,7 @@ void downloadableFocus(TreeNode* node) {
             break;
     }
 
-    if (!is_restart) {
+    if (!is_exit_app) {
         std::cout << WHITE "\n\nPress B to exit.\n" RESET;
         consoleUpdate(NULL);
         u64 k;

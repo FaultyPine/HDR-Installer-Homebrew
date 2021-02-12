@@ -237,10 +237,6 @@ namespace gh {
             if (token != nullptr) {
                 curl.SetHeaders({ makeAuthHeader(token) });
             }
-            else {
-                std::cout << RED "\nInvalid token passed!\n" RESET;
-                pauseForText(2);
-            }
             
             std::stringstream buffer;
             buffer << "https://api.github.com/repos/" << repository << "/releases/tags/" << tag;
@@ -329,8 +325,8 @@ namespace gh {
                     return DownloadResult::DOWNLOAD_FAILED;
                 }
                 fclose(file);
-                if (std::filesystem::exists(path) && assets[i].content_type == "application/zip") { // if it's a zip, extract to root then delete it
-                    std::cout << GREEN "\nExtracting...\n" RESET;
+                if (std::filesystem::exists(path) && (assets[i].content_type == "application/zip" || assets[i].filename.find(".zip") != std::string::npos)) { // if it's a zip, extract to root then delete it
+                    std::cout << GREEN "\nExtracting..." << RESET " Please be patient, this may take some time.\n";
                     consoleUpdate(NULL);
                     //if (!std::filesystem::exists(TMP_EXTRACTED))
                         //std::filesystem::create_directories(TMP_EXTRACTED);
@@ -342,7 +338,7 @@ namespace gh {
                     std::cout << GREEN "Update complete! Restarting app...\n" RESET;
                     pauseForText(1);
                     envSetNextLoad(APP_NRO_PATH, APP_NRO_PATH);
-                    is_restart = true;
+                    is_exit_app = true;
                 }
             }
             ret = DownloadResult::SUCCESS;

@@ -77,7 +77,7 @@ void pauseForText(int seconds = 3);
 gh::OauthToken loadOauthToken();
 void destroyOauthToken(gh::OauthToken token);
 void prep();
-extern bool is_restart;
+extern bool is_exit_app;
 /*
 extern json installed_json;
 void SaveJson(json j_obj = installed_json, std::filesystem::path path = INSTALLED_MODS);
