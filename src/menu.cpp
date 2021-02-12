@@ -148,13 +148,13 @@ void downloadableFocus(TreeNode* node) {
     }
 
     if (!is_exit_app) {
-        std::cout << WHITE "\n\nPress B to exit.\n" RESET;
+        std::cout << WHITE "\n\nPress any button to exit.\n" RESET;
         consoleUpdate(NULL);
         u64 k;
         do {
             hidScanInput();
             k = hidKeysDown(CONTROLLER_P1_AUTO);
-        } while (!(k & KEY_B));
+        } while (k == 0);
     }
 
 }
